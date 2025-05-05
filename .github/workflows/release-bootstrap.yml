@@ -14,7 +14,7 @@ name: release-please 🥾 strap
 
 jobs:
   release-please-bootstrap:
-    runs-on: devnet-runner
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
