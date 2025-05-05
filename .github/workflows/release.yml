@@ -1,0 +1,35 @@
+# .github/workflows/release.yml
+
+name: Build and Verify Release on Tag
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build_and_verify:
+    name: Build Package and Verify
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build
+
+      - name: Build package
+        run: python -m build
+
+      # - name: Run tests
+      #   run: |
+      #     pip install pytest # Install pytest if not in dependencies
+      #     pytest
