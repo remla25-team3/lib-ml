@@ -1,5 +1,4 @@
-name: Build and Verify Release on Tag
-
+name: Build and Verify Python Package
 on:
   push:
     branches:
