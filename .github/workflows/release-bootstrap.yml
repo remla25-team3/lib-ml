@@ -4,11 +4,11 @@ on:
       init-ver:
         description: 'Initial version'
         required: true
-        default: '0.0.1'
+        default: '0.1.0'
       release-type:
         description: 'Release type'
         required: true
-        default: 'simple'
+        default: 'python'
 
 name: release-please 🥾 strap
 
