@@ -41,6 +41,7 @@ def preprocess(df: pd.DataFrame) -> List[str]:
     corpus = []
     ps = PorterStemmer()
     
+    df['Review'] = df['Review'].astype(str)
     for review in df['Review']:
         # Remove non-alphabetic characters
         review = re.sub(r'[^a-zA-Z]', ' ', review)
