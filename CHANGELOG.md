@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/remla25-team3/lib-ml/compare/v0.3.0...v0.3.1) (2025-05-26)
+
+
+### Bug Fixes
+
+* Update __init__.py ([#10](https://github.com/remla25-team3/lib-ml/issues/10)) ([b20956c](https://github.com/remla25-team3/lib-ml/commit/b20956c11959517802ee28ef8240a466d06ae78f))
+
 ## [0.3.0](https://github.com/remla25-team3/lib-ml/compare/v0.2.0...v0.3.0) (2025-05-26)
 
 
