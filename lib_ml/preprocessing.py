@@ -27,10 +27,12 @@ def preprocess(df: pd.DataFrame) -> List[str]:
     
     Args:
         df (pd.DataFrame): DataFrame containing a 'Review' column
-        stopwords (set, optional): Set of stopwords to remove. If None, will use default English stopwords.
     
     Returns:
         List[str]: List of processed review texts
+    
+    Note:
+        The function uses a default set of English stopwords (with "not" excluded) prepared by the `_prepare_stopwords` function.
     """
     if 'Review' not in df.columns:
         raise ValueError("DataFrame must contain a 'Review' column")
