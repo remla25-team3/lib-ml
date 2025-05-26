@@ -14,7 +14,7 @@ def _prepare_stopwords() -> set:
     try:
         nltk.download('stopwords', quiet=True)
         stop_words = set(stopwords.words('english'))
-        stop_words.remove('not')
+        stop_words.discard('not')
         return stop_words
     except Exception as e:
         print(f"Error preparing stopwords: {e}")
