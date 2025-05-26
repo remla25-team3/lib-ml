@@ -1,111 +1,58 @@
+import pandas as pd
 import re
-import string
+import nltk
 
+from nltk.corpus import stopwords
+from nltk.stem.porter import PorterStemmer
 from typing import List
 
 
-try:
-    import nltk
-    from nltk.corpus import stopwords
-    from nltk.stem import WordNetLemmatizer
-    from nltk.tokenize import word_tokenize
-
+def _prepare_stopwords() -> set:
+    """
+    Prepare the stopwords for the preprocessing.
+    """
     try:
-        nltk.data.find('corpora/wordnet')
-    except LookupError:
-        print("NLTK 'wordnet' not found. Downloading...")
-        nltk.download('wordnet', quiet=True)
-
-    try:
-        nltk.data.find('corpora/stopwords')
-    except LookupError:
-        print("NLTK 'stopwords' not found. Downloading...")
         nltk.download('stopwords', quiet=True)
-
-    try:
-        nltk.data.find('tokenizers/punkt')
-    except LookupError:
-        print("NLTK 'punkt' not found. Downloading...")
-        nltk.download('punkt', quiet=True)
-
-    lemmatizer = WordNetLemmatizer()
-    stop_words = set(stopwords.words('english'))
-
-except ImportError:
-    lemmatizer = None
-    stop_words = set()
-    word_tokenize = lambda x: x.split()
-
-def lowercase_text(text: str) -> str:
-    if not isinstance(text, str):
-        return ""
-    return text.lower()
-
-def remove_punctuation(text: str) -> str:
-    if not isinstance(text, str):
-        return ""
-    return text.translate(str.maketrans('', '', string.punctuation))
-
-def remove_numbers(text: str) -> str:
-    if not isinstance(text, str):
-        return ""
-    return re.sub(r'\d+', '', text)
-
-def remove_extra_whitespace(text: str) -> str:
-    if not isinstance(text, str):
-        return ""
-    return " ".join(text.split())
-
-def tokenize_text(text: str) -> List[str]:
-    if not isinstance(text, str):
-        return []
-    try:
-        return word_tokenize(text)
-    except LookupError:
-        try:
-            nltk.download('punkt', quiet=True)
-            return word_tokenize(text)
-        except Exception as download_error:
-            print(f"Failed to download 'punkt': {download_error}")
-            return text.split()
+        stop_words = set(stopwords.words('english'))
+        stop_words.discard('not')
+        return stop_words
     except Exception as e:
-        print(f"Error tokenizing text: {text}\nError: {e}")
-        return text.split()
-
-def remove_stopwords(tokens: List[str]) -> List[str]:
-    """Removes common English stopwords."""
-    if not stop_words:
-        return tokens
-    return [word for word in tokens if word not in stop_words and len(word) > 1]
-
-def lemmatize_tokens(tokens: List[str]) -> List[str]:
-    if not lemmatizer:
-        return tokens
-    return [lemmatizer.lemmatize(word) for word in tokens]
-
-# --- Main Preprocessing Function ---
-
-def preprocess_text(text: str) -> str:
-    if not isinstance(text, str) or not text.strip():
-        return ""
-
-    try:
-        text = lowercase_text(text)
-        text = remove_punctuation(text)
-        text = remove_numbers(text)
-        text = remove_extra_whitespace(text)
-        tokens = tokenize_text(text)
-        tokens = remove_stopwords(tokens)
-        tokens = lemmatize_tokens(tokens)
-        return " ".join(tokens)
-
-    except Exception as e:
-        print(f"Error processing text: {text}\nError: {e}")
-        return ""
+        print(f"Error preparing stopwords: {e}")
+        return set()
 
 
-if __name__ == '__main__':
-    sample_review = "The food at 'The Grand Place!' was AMAZINGLY good, maybe 5 stars?? Loved it! Cost 25 dollars."
-    processed_review = preprocess_text(sample_review)
-    print(f"Original: '{sample_review}'")
-    print(f"Processed: '{processed_review}'")
+def preprocess(df: pd.DataFrame) -> List[str]:
+    """
+    Process reviews from a DataFrame through text preprocessing pipeline.
+    
+    Args:
+        df (pd.DataFrame): DataFrame containing a 'Review' column
+    
+    Returns:
+        List[str]: List of processed review texts
+    
+    Note:
+        The function uses a default set of English stopwords (with "not" excluded) prepared by the `_prepare_stopwords` function.
+    """
+    if 'Review' not in df.columns:
+        raise ValueError("DataFrame must contain a 'Review' column")
+        
+    stop_words = _prepare_stopwords()
+    corpus = []
+    ps = PorterStemmer()
+    
+    df['Review'] = df['Review'].astype(str)
+    for review in df['Review']:
+        # Remove non-alphabetic characters
+        review = re.sub(r'[^a-zA-Z]', ' ', review)
+        # Convert to lowercase
+        review = review.lower()
+        # Split into words
+        words = review.split()
+        # Remove stopwords and apply stemming
+        processed_words = [ps.stem(word) for word in words if word not in stop_words]
+        # Join back into a string
+        processed_review = ' '.join(processed_words)
+        corpus.append(processed_review)
+    
+    return corpus
