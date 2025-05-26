@@ -43,7 +43,7 @@ def preprocess(df: pd.DataFrame) -> List[str]:
     
     for review in df['Review']:
         # Remove non-alphabetic characters
-        review = re.sub('[^a-zA-Z]', ' ', review)
+        review = re.sub(r'[^a-zA-Z]', ' ', review)
         # Convert to lowercase
         review = review.lower()
         # Split into words
