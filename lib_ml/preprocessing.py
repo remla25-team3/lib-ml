@@ -40,8 +40,11 @@ def preprocess(df: pd.DataFrame) -> List[str]:
     stop_words = _prepare_stopwords()
     corpus = []
     ps = PorterStemmer()
-    
+    seen = set()
+
+    # Ensure string type
     df['Review'] = df['Review'].astype(str)
+
     for review in df['Review']:
         # Remove non-alphabetic characters
         review = re.sub(r'[^a-zA-Z]', ' ', review)
@@ -53,6 +56,10 @@ def preprocess(df: pd.DataFrame) -> List[str]:
         processed_words = [ps.stem(word) for word in words if word not in stop_words]
         # Join back into a string
         processed_review = ' '.join(processed_words)
-        corpus.append(processed_review)
+
+        # Deduplicate based on processed form
+        if processed_review and processed_review not in seen:
+            seen.add(processed_review)
+            corpus.append(processed_review)
     
     return corpus
