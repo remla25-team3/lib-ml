@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/remla25-team3/lib-ml/compare/v0.3.1...v0.4.0) (2025-06-04)
+
+
+### Features
+
+* Avoid empy rows ([#16](https://github.com/remla25-team3/lib-ml/issues/16)) ([5c048bc](https://github.com/remla25-team3/lib-ml/commit/5c048bc6e66d4d830030af50442e124e41c72409))
+
 ## [0.3.1](https://github.com/remla25-team3/lib-ml/compare/v0.3.0...v0.3.1) (2025-05-26)
 
 
