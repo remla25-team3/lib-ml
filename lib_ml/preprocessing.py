@@ -41,6 +41,7 @@ def preprocess(df: pd.DataFrame) -> List[str]:
     corpus = []
     ps = PorterStemmer()
     seen = set()
+    pattern = re.compile(r'^[a-z ]+$') # allow only lowercase letters and spaces
 
     # Ensure string type
     df['Review'] = df['Review'].astype(str)
@@ -58,7 +59,7 @@ def preprocess(df: pd.DataFrame) -> List[str]:
         processed_review = ' '.join(processed_words)
 
         # Deduplicate based on processed form
-        if processed_review and processed_review not in seen:
+        if processed_review and pattern.fullmatch(processed_review) and processed_review not in seen:
             seen.add(processed_review)
             corpus.append(processed_review)
     
