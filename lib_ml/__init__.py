@@ -1,3 +1,1 @@
-from .preprocessing import (
-    preprocess
-)
+from .preprocessing import preprocess

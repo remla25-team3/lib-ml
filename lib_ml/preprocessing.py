@@ -1,10 +1,10 @@
-import pandas as pd
 import re
-import nltk
+from typing import List, Tuple
 
+import nltk
+import pandas as pd
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
-from typing import List
 
 
 def _prepare_stopwords() -> set:
@@ -21,33 +21,45 @@ def _prepare_stopwords() -> set:
         return set()
 
 
-def preprocess(df: pd.DataFrame) -> List[str]:
+def preprocess(df: pd.DataFrame, inference: bool = False) -> Tuple[List[str], List[str]]:
     """
-    Process reviews from a DataFrame through text preprocessing pipeline.
-    
+    Preprocess restaurant reviews from a DataFrame by applying text cleaning,
+    lowercasing, stopword removal (excluding "not"), stemming, and deduplication.
+
     Args:
-        df (pd.DataFrame): DataFrame containing a 'Review' column
-    
+        df (pd.DataFrame): DataFrame containing at least a 'Review' column and, unless `inference=True`, a second column with labels.
+        inference (bool): If True, skips label extraction and returns only the processed text.
+
     Returns:
-        List[str]: List of processed review texts
-    
-    Note:
-        The function uses a default set of English stopwords (with "not" excluded) prepared by the `_prepare_stopwords` function.
+        Tuple[List[str], List[str]]: A tuple where the first element is a list of unique cleaned reviews,
+                                     and the second is the corresponding list of labels (empty if inference=True).
+
+    Raises:
+        ValueError: If the 'Review' column is missing.
+
+    Notes:
+        - Duplicate or non-alphabetic-only reviews are removed after preprocessing.
+        - The function uses a default English stopword list with "not" retained for sentiment purposes.
     """
+
+    # return corpus
     if 'Review' not in df.columns:
         raise ValueError("DataFrame must contain a 'Review' column")
-        
     stop_words = _prepare_stopwords()
-    corpus = []
     ps = PorterStemmer()
     seen = set()
-    pattern = re.compile(r'^[a-z ]+$') # allow only lowercase letters and spaces
+    pattern = re.compile(r'^[a-z ]+$')
 
-    # Ensure string type
+    df = df.copy()
     df['Review'] = df['Review'].astype(str)
 
-    for review in df['Review']:
-        # Remove non-alphabetic characters
+    corpus = []
+    labels = []
+
+    for _, row in df.iterrows():
+        review = row['Review']
+        label = row.iloc[1] if not inference else None
+
         review = re.sub(r'[^a-zA-Z]', ' ', review)
         # Convert to lowercase
         review = review.lower()
@@ -62,5 +74,7 @@ def preprocess(df: pd.DataFrame) -> List[str]:
         if processed_review and pattern.fullmatch(processed_review) and processed_review not in seen:
             seen.add(processed_review)
             corpus.append(processed_review)
-    
-    return corpus
+            if not inference:
+                labels.append(label)
+
+    return (corpus, labels) if not inference else (corpus, [])
