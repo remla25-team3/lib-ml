@@ -78,3 +78,4 @@ def preprocess(df: pd.DataFrame, inference: bool = False) -> Tuple[List[str], Li
                 labels.append(label)
 
     return (corpus, labels) if not inference else (corpus, [])
+
